@@ -1,0 +1,40 @@
+<html>
+<head>
+<title>Demux Demo</title>
+
+
+<script type="text/javascript" src="../fx/flapjax.js"></script>
+
+
+<script>
+
+function start() {
+	var es = F.receiverE();
+	var count = 500;
+	var sinks = [];
+	for(var i=0; i < count; i++) {
+        (function (c) {
+			sinks[i] = es.filterE(
+				function (e) {
+				    return (e % count == i);
+				});
+			return;
+		})();
+    };
+	
+	var t0 = (new Date).getTime();
+    var sum = 0;
+    for(var i=0; i < 100000; i++) {
+        es.sendEvent(es, i);
+    };
+    var t = (new Date).getTime() - t0;
+    alert(t);
+}
+
+window.addEventListener("load", start, false);
+
+</script>
+</head>
+<body>
+</body>
+</html>

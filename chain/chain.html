@@ -1,0 +1,38 @@
+<html>
+<head>
+<title>Demux Demo</title>
+
+
+<script type="text/javascript" src="../fx/flapjax.js"></script>
+
+
+<script>
+
+function start() {
+	var x = F.receiverE();
+	var count = 100;
+	var sum = x;
+	for(var i=0; i < count; i++) {
+		var y = sum;
+		if (i % 2 == 0) sum = y.mapE(function (v) { return v + 0.1; });
+		           else sum = y.mapE(function (v) { return v - 0.1; });
+    };
+	
+	var res = 0;
+    sum.mapE(function (v) { res += v; });
+	var iters = 100000;
+	var t0 = (new Date).getTime();
+    for(var i=0; i < iters; i++) {
+        x.sendEvent(i);
+    };
+    var t = (new Date).getTime() - t0;
+    alert("Result: " + res + "\nin " + t + "ms, " + iters/t*1000.0 + "iters/sec.");
+}
+
+window.addEventListener("load", start, false);
+
+</script>
+</head>
+<body>
+</body>
+</html>

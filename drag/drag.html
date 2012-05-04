@@ -1,0 +1,74 @@
+<html>
+<head>
+<title>Drag Demo</title>
+
+
+<script type="text/javascript" src="../fx/flapjax.js"></script>
+
+
+<script>
+
+var Event = function(x, y) {
+	this.x = x;
+	this.y = y;
+}
+
+function dragE(down, move, up) {
+  // moveEe :: EventStream (EventStream { left: int, top: int })
+  var moveEe = down.mapE(function(md) {
+    var startX = md.x;
+    var startY = md.y;
+
+    return move.mapE(function(mm) {
+      return new Event(mm.x - startX, mm.y - startY);
+    });
+  });
+  
+  // dropEe :: EventStream (EventStream 'a)
+  var dropEe = up.mapE(function() {
+    return F.zeroE();
+  });
+  
+  return moveEe.mergeE(dropEe).switchE();
+}
+
+function start() {
+	var down = F.receiverE();
+	var move = F.receiverE();
+	var up = F.receiverE();
+	
+	var es = dragE(down, move, up);
+	
+	var res = 0;
+	var received = 0;
+    es.mapE(function (v) { received += 1; res += v.x + v.y; });
+	
+	var iters = 1000;
+	//run(down, move, up);
+	var t0 = (new Date).getTime();
+    run(iters, down, move, up);
+    var t = (new Date).getTime() - t0;
+    alert("Receive count: " + received + ", result: " + res + "\nin " + t + "ms, " + iters/t*1000.0 + "iters/sec.");
+}
+
+function run(iters, down, move, up) {
+	for(var i=0; i < iters; i++) {
+		down.sendEvent(new Event(Math.random(), Math.random()));
+		for(var j=0; j < 10; j++) {
+			move.sendEvent(new Event(Math.random(), Math.random()));
+		};
+		up.sendEvent(new Event(Math.random(), Math.random()));
+		// shouldn't have any effect:
+		for(var j=0; j < 100; j++) {
+			move.sendEvent(new Event(Math.random(), Math.random()));
+		};
+    };
+};
+
+window.addEventListener("load", start, false);
+
+</script>
+</head>
+<body>
+</body>
+</html>

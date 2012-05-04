@@ -1,0 +1,44 @@
+<html>
+<head>
+<title>Demux Demo</title>
+
+
+<script type="text/javascript" src="../ob.js"></script>
+
+
+<script>
+
+function start() {
+	var x = new Observable();
+	var count = 100;
+	var sum = x;
+	for(var i=0; i < count; i++) {
+		(function() {
+		var z = new Observable();
+		if (i % 2 == 0) sum.addOb(function (v) { z.setValue(v + 0.1) });
+		           else sum.addOb(function (v) { z.setValue(v - 0.1) });
+		sum = z;
+     	})();
+    };
+
+    var res = 0;
+    sum.addOb(function (v) { res += v; });
+	var iters = 100000;
+	/*for(var i=0; i < iters; i++) {
+        x.setValue(i);
+    };*/
+	var t0 = (new Date).getTime();
+    for(var i=0; i < iters; i++) {
+        x.setValue(i);
+    };
+    var t = (new Date).getTime() - t0;
+    alert("Result: " + res + "\nin " + t + "ms, " + iters/t*1000.0 + "iters/sec.");
+}
+
+window.addEventListener("load", start, false);
+
+</script>
+</head>
+<body>
+</body>
+</html>

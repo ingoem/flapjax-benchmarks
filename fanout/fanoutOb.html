@@ -1,0 +1,51 @@
+<html>
+<head>
+<title>Fanout Observer Demo</title>
+
+
+<script type="text/javascript" src="../ob.js"></script>
+
+
+<script>
+
+function start() {
+	var x = new Observable();
+	var count = 100;
+	var obs = [];
+	for(var i=0; i < count; i++) {
+		//(function() {
+			var sink = new Observable();
+			if (i % 2 == 0) x.addOb(function (v) { sink.setValue(v + Math.random()) });
+		           	   else x.addOb(function (v) { sink.setValue(v - Math.random()) });
+			obs.push(sink);
+     	//})();
+    };
+
+    var res = 0;
+	var received = 0;
+	for(var i=0; i < count; i++) {
+		obs[i].addOb(function (v) {
+			received++;  
+			res += v;
+		});
+    };
+
+	var iters = 1000000;
+	/*for(var i=0; i < iters; i++) {
+        x.setValue(i);
+    };*/
+	var t0 = (new Date).getTime();
+    for(var i=0; i < iters; i++) {
+        x.setValue(Math.random());
+    };
+    var t = (new Date).getTime() - t0;
+    alert("Result: " + res + ", receive count: " + received + "\nin " + t + "ms, " + iters/t*1000.0 + "iters/sec.");
+}
+
+window.addEventListener("load", start, false);
+
+</script>
+</head>
+<body>
+</body>
+</html>

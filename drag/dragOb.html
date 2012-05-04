@@ -1,0 +1,67 @@
+<html>
+<head>
+<title>Drag Demo</title>
+
+
+<script type="text/javascript" src="../ob.js"></script>
+
+
+<script>
+
+var Event = function(x, y) {
+	this.x = x;
+	this.y = y;
+}
+
+function start() {
+	var down = new Observable();
+	var move = new Observable();
+	var up = new Observable();
+	var drag = new Observable();
+	
+	var startX, startY = 0;
+	var moveOb = function(mm) {
+		drag.setValue(new Event(mm.x - startX, mm.y - startY));
+	};
+	down.addOb(function(md) {
+		startX = md.x;
+	    startY = md.y;
+		move.addOb(moveOb);
+	});
+	up.addOb(function(v) {
+		move.removeOb(moveOb);
+	});
+	
+	var res = 0;
+	var received = 0;
+	drag.addOb(function (v) { received += 1; res += v.x + v.y; });
+	
+	var iters = 100000;
+	//run(iters, down, move, up);
+	var t0 = (new Date).getTime();
+    run(iters, down, move, up);
+    var t = (new Date).getTime() - t0;
+    alert("Receive count: " + received + ", result: " + res + "\nin " + t + "ms, " + iters/t*1000.0 + "iters/sec.");
+}
+
+function run(iters, down, move, up) {
+	for(var i=0; i < iters; i++) {
+		down.setValue(new Event(Math.random(), Math.random()));
+		for(var j=0; j < 10; j++) {
+			move.setValue(new Event(Math.random(), Math.random()));
+		};
+		up.sendEvent(new Event(Math.random(), Math.random()));
+		// shouldn't have any effect:
+		for(var j=0; j < 100; j++) {
+			move.setValue(new Event(Math.random(), Math.random()));
+		};
+    };
+}
+
+window.addEventListener("load", start, false);
+
+</script>
+</head>
+<body>
+</body>
+</html>

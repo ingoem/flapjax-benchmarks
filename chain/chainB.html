@@ -1,0 +1,38 @@
+<html>
+<head>
+<title>Chain Behavior Demo</title>
+
+
+<script type="text/javascript" src="../fx/flapjax.js"></script>
+
+
+<script>
+
+function start() {
+	var es = F.receiverE()
+	var x = new F.Behavior(es, 0);
+	var count = 100;
+	var sum = x;
+	for(var i=0; i < count; i++) {
+		if (i % 2 == 0) sum = sum.liftB(function (v) { return v + Math.random(); });
+		           else sum = sum.liftB(function (v) { return v - Math.random(); });
+    };
+	
+	var res = 0;
+    sum.liftB(function (v) { res += v; });
+	var iters = 100000;
+	var t0 = (new Date).getTime();
+    for(var i=0; i < iters; i++) {
+        x.sendBehavior(i);
+    };
+    var t = (new Date).getTime() - t0;
+    alert("Result: " + res + "\nin " + t + "ms, " + iters/t*1000.0 + "iters/sec.");
+}
+
+window.addEventListener("load", start, false);
+
+</script>
+</head>
+<body>
+</body>
+</html>
